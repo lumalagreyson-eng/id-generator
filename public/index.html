@@ -253,6 +253,17 @@
     </div>
 
     <script>
+        <script>
+        // Force clear all fields on page load to prevent browser autofill
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('#barcodeForm input, #barcodeForm select').forEach(element => {
+                if (element.type === 'text' || element.tagName === 'SELECT') {
+                    element.value = '';
+                }
+            });
+        });
+
+        // --- Your long existing code continues right below this line ---
         // Optional convenience: Auto-sync DAJ state text input when dropdown changes
         document.getElementById('targetState').addEventListener('change', function() {
             if(this.value) {
