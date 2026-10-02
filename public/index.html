@@ -253,8 +253,7 @@
     </div>
 
     <script>
-<script>
-        // Defeat browser memory cache and persistent autofill on refresh/back
+        // Defeat stubborn mobile browser autofill across focus, visibility, and page restoration
         const wipeForm = () => {
             const form = document.getElementById('barcodeForm');
             if (form) form.reset();
@@ -265,12 +264,21 @@
             });
         };
 
+        // Wipe on every possible browser life-cycle event
         window.addEventListener('pageshow', wipeForm);
-        window.addEventListener('load', () => {
-            wipeForm();
-            setTimeout(wipeForm, 100);
-            setTimeout(wipeForm, 300);
+        window.addEventListener('load', wipeForm);
+        window.addEventListener('focus', wipeForm);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) wipeForm();
         });
+
+        // Run an aggressive clearing loop for a full 5 seconds to catch late injections
+        let attempts = 0;
+        const autofillKiller = setInterval(() => {
+            wipeForm();
+            attempts++;
+            if (attempts > 50) clearInterval(autofillKiller); 
+        }, 100);
         document.getElementById('targetState').addEventListener('change', function() {
             if(this.value) {
                 document.getElementById('daj').value = this.value;
