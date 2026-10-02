@@ -254,15 +254,23 @@
 
     <script>
         // Force clear all fields immediately and after browser autofill attempts
-        // Force clear fields repeatedly to override stubborn mobile browser memory restore
-        const clearFields = () => {
+       // Defeat browser memory cache and persistent autofill on refresh/back
+        const wipeForm = () => {
+            const form = document.getElementById('barcodeForm');
+            if (form) form.reset();
             document.querySelectorAll('#barcodeForm input, #barcodeForm select').forEach(element => {
                 if (element.type === 'text' || element.tagName === 'SELECT') {
                     element.value = '';
                 }
             });
         };
-        window.addEventListener('load', clearFields);
+
+        window.addEventListener('pageshow', wipeForm);
+        window.addEventListener('load', () => {
+            wipeForm();
+            setTimeout(wipeForm, 100);
+            setTimeout(wipeForm, 300);
+        });
         setTimeout(clearFields, 100);
         setTimeout(clearFields, 300);
         setTimeout(clearFields, 600);
