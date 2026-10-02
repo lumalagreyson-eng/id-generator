@@ -254,14 +254,18 @@
 
     <script>
         // Force clear all fields immediately and after browser autofill attempts
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.querySelectorAll('#barcodeForm input, #barcodeForm select').forEach(element => {
-                    if (element.type === 'text' || element.tagName === 'SELECT') {
-                        element.value = '';
-                    }
-                });
-            }, 50);
+        // Force clear fields repeatedly to override stubborn mobile browser memory restore
+        const clearFields = () => {
+            document.querySelectorAll('#barcodeForm input, #barcodeForm select').forEach(element => {
+                if (element.type === 'text' || element.tagName === 'SELECT') {
+                    element.value = '';
+                }
+            });
+        };
+        window.addEventListener('load', clearFields);
+        setTimeout(clearFields, 100);
+        setTimeout(clearFields, 300);
+        setTimeout(clearFields, 600);
         });
 
         // --- Your long existing code continues right below this line ---
