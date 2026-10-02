@@ -253,8 +253,7 @@
     </div>
 
     <script>
-        // Force clear all fields immediately and after browser autofill attempts
-       // Defeat browser memory cache and persistent autofill on refresh/back
+        // Defeat browser memory cache and persistent autofill on refresh/back
         const wipeForm = () => {
             const form = document.getElementById('barcodeForm');
             if (form) form.reset();
@@ -271,13 +270,6 @@
             setTimeout(wipeForm, 100);
             setTimeout(wipeForm, 300);
         });
-        setTimeout(clearFields, 100);
-        setTimeout(clearFields, 300);
-        setTimeout(clearFields, 600);
-        });
-
-        // --- Your long existing code continues right below this line ---
-        // Optional convenience: Auto-sync DAJ state text input when dropdown changes
         document.getElementById('targetState').addEventListener('change', function() {
             if(this.value) {
                 document.getElementById('daj').value = this.value;
