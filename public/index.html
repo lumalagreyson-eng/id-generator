@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAMVA Barcode Formatter & Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 900px; background: #fff; padding: 30px; margin: auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: span 3; }
+        .form-group.two-thirds { grid-column: span 2; }
+        label { font-size: 12px; font-weight: bold; color: #555; margin-bottom: 5px; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        
+        button[type="submit"] { background: #28a745; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; }
+        button[type="submit"]:hover { background: #218838; }
+
+        #loading { display: none; text-align: center; font-weight: bold; color: #555; margin-top: 20px; font-size: 16px; }
+        #output { margin-top: 30px; text-align: center; display: none; }
+        
+        .barcode-section { margin-top: 20px; background: #fafafa; padding: 20px; border: 1px solid #ddd; border-radius: 6px; display: inline-block; width: 85%; }
+        .barcode-section h4 { margin-top: 0; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 8px; }
+        img { max-width: 100%; display: block; margin: 15px auto; background: white; padding: 10px; border: 1px solid #ccc; }
+        
+        .dl-btn { background: #28a745; margin-top: 10px; width: auto; padding: 10px 20px; font-size: 15px; border-radius: 4px; color: white; border: none; cursor: pointer; font-weight: bold; display: inline-block; text-decoration: none; }
+        .dl-btn:hover { background: #218838; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>AAMVA Barcode Formatter & Generator</h2>
+        <form id="barcodeForm">
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Select Target Jurisdiction / State</label>
+                    <select id="targetState" required>
+                        <option value="">-- Select State --</option>
+                        <option value="AL">Alabama (AL)</option>
+                        <option value="AK">Alaska (AK)</option>
+                        <option value="AZ">Arizona (AZ)</option>
+                        <option value="AR">Arkansas (AR)</option>
+                        <option value="CA">California (CA)</option>
+                        <option value="CO">Colorado (CO)</option>
+                        <option value="CT">Connecticut (CT)</option>
+                        <option value="DE">Delaware (DE)</option>
+                        <option value="FL">Florida (FL)</option>
+                        <option value="GA">Georgia (GA)</option>
+                        <option value="HI">Hawaii (HI)</option>
+                        <option value="ID">Idaho (ID)</option>
+                        <option value="IL">Illinois (IL)</option>
+                        <option value="IN">Indiana (IN)</option>
+                        <option value="IA">Iowa (IA)</option>
+                        <option value="KS">Kansas (KS)</option>
+                        <option value="KY">Kentucky (KY)</option>
+                        <option value="LA">Louisiana (LA)</option>
+                        <option value="ME">Maine (ME)</option>
+                        <option value="MD">Maryland (MD)</option>
+                        <option value="MA">Massachusetts (MA)</option>
+                        <option value="MI">Michigan (MI)</option>
+                        <option value="MN">Minnesota (MN)</option>
+                        <option value="MS">Mississippi (MS)</option>
+                        <option value="MO">Missouri (MO)</option>
+                        <option value="MT">Montana (MT)</option>
+                        <option value="NE">Nebraska (NE)</option>
+                        <option value="NV">Nevada (NV)</option>
+                        <option value="NH">New Hampshire (NH)</option>
+                        <option value="NJ">New Jersey (NJ)</option>
+                        <option value="NM">New Mexico (NM)</option>
+                        <option value="NY">New York (NY)</option>
+                        <option value="NC">North Carolina (NC)</option>
+                        <option value="ND">North Dakota (ND)</option>
+                        <option value="OH">Ohio (OH)</option>
+                        <option value="OK">Oklahoma (OK)</option>
+                        <option value="OR">Oregon (OR)</option>
+                        <option value="PA">Pennsylvania (PA)</option>
+                        <option value="RI">Rhode Island (RI)</option>
+                        <option value="SC">South Carolina (SC)</option>
+                        <option value="SD">South Dakota (SD)</option>
+                        <option value="TN">Tennessee (TN)</option>
+                        <option value="TX" selected>Texas (TX)</option>
+                        <option value="UT">Utah (UT)</option>
+                        <option value="VT">Vermont (VT)</option>
+                        <option value="VA">Virginia (VA)</option>
+                        <option value="WA">Washington (WA)</option>
+                        <option value="WV">West Virginia (WV)</option>
+                        <option value="WI">Wisconsin (WI)</option>
+                        <option value="WY">Wyoming (WY)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group"><label>DL No (DAQ)</label><input type="text" id="daq" required value="44444597"></div>
+                <div class="form-group"><label>First Name (DAC)</label><input type="text" id="dac" required value="Jacob"></div>
+                <div class="form-group"><label>Middle Name (DAD)</label><input type="text" id="dad" value=""></div>
+                <div class="form-group"><label>Last Name (DCS)</label><input type="text" id="dcs" required value="Whiting"></div>
+                
+                <div class="form-group">
+                    <label>Suffix (DCU)</label>
+                    <select id="dcu">
+                        <option value="" selected>None</option>
+                        <option value="JR">JR - Junior</option>
+                        <option value="SR">SR - Senior</option>
+                        <option value="II">II - Second</option>
+                        <option value="III">III - Third</option>
+                        <option value="IV">IV - Fourth</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>License Class (DCA)</label>
+                    <select id="dca" required>
+                        <option value="C" selected>C - Standard Driver License</option>
+                        <option value="A">A - Commercial Class A</option>
+                        <option value="B">B - Commercial Class B</option>
+                        <option value="M">M - Motorcycle</option>
+                    </select>
+                </div>
+
+                <div class="form-group"><label>Issue Date (DBD)</label><input type="text" id="dbd" placeholder="MMDDYYYY" maxlength="8" required value="05262022"></div>
+                <div class="form-group"><label>Date of Birth (DBB)</label><input type="text" id="dbb" placeholder="MMDDYYYY" maxlength="8" required value="05082005"></div>
+                <div class="form-group"><label>Expiry Date (DBA)</label><input type="text" id="dba" placeholder="MMDDYYYY" maxlength="8" required value="05082028"></div>
+                
+                <div class="form-group">
+                    <label>Sex (DBC)</label>
+                    <select id="dbc" required>
+                        <option value="1" selected>1 - Male</option>
+                        <option value="2">2 - Female</option>
+                        <option value="9">9 - Not Specified</option>
+                    </select>
+                </div>
+
+                <div class="form-group"><label>Height (DAU)</label><input type="text" id="dau" placeholder="073 IN" required value="063 IN"></div>
+                
+                <div class="form-group">
+                    <label>Eye Color (DAY)</label>
+                    <select id="day" required>
+                        <option value="BLK" selected>Black (BLK)</option>
+                        <option value="BLU">Blue (BLU)</option>
+                        <option value="BRO">Brown (BRO)</option>
+                        <option value="GRY">Gray (GRY)</option>
+                        <option value="GRN">Green (GRN)</option>
+                        <option value="HAZ">Hazel (HAZ)</option>
+                        <option value="MAR">Maroon (MAR)</option>
+                        <option value="PNK">Pink (PNK)</option>
+                        <option value="DIC">Multicolored (DIC)</option>
+                        <option value="UNK">Unknown (UNK)</option>
+                    </select>
+                </div>
+
+                <div class="form-group"><label>Weight in lbs (DAW)</label><input type="text" id="daw" placeholder="180" required value="168"></div>
+                
+                <div class="form-group">
+                    <label>Hair Color (DAZ)</label>
+                    <select id="daz" required>
+                        <option value="BLK" selected>Black (BLK)</option>
+                        <option value="BRO">Brown (BRO)</option>
+                        <option value="BLN">Blond (BLN)</option>
+                        <option value="RED">Red / Auburn (RED)</option>
+                        <option value="GRY">Gray (GRY)</option>
+                        <option value="SDY">Sandy (SDY)</option>
+                        <option value="WHI">White (WHI)</option>
+                        <option value="BAL">Bald (BAL)</option>
+                        <option value="UNK">Unknown (UNK)</option>
+                    </select>
+                </div>
+
+                <div class="form-group"><label>Ethnicity (DCL)</label><input type="text" id="dcl" placeholder="Optional" value="BKO"></div>
+                
+                <div class="form-group">
+                    <label>Restrictions (DCB)</label>
+                    <select id="dcb">
+                        <option value="NONE" selected>NONE - None</option>
+                        <option value="A">A - Corrective Lenses</option>
+                        <option value="B">B - Daylight Only</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Endorsements (DCD)</label>
+                    <select id="dcd">
+                        <option value="NONE" selected>NONE - None</option>
+                        <option value="M">M - Motorcycle</option>
+                        <option value="H">H - Hazardous Materials</option>
+                    </select>
+                </div>
+
+                <div class="form-group two-thirds"><label>Address (DAG)</label><input type="text" id="dag" required value="700 Dawson"></div>
+                <div class="form-group"><label>City (DAI)</label><input type="text" id="dai" required value="San Antonio"></div>
+                <div class="form-group"><label>State Code (DAJ)</label><input type="text" id="daj" placeholder="TX" maxlength="2" required value="TX"></div>
+                <div class="form-group"><label>Zip Code (DAK)</label><input type="text" id="dak" placeholder="75001" required value="78202"></div>
+                <div class="form-group"><label>Document Discriminator (DCF)</label><input type="text" id="dcf" value="00629280055206618271"></div>
+                <div class="form-group"><label>Inventory Control Number (DCK)</label><input type="text" id="dck" value="10000414648"></div>
+            </div>
+            <button type="submit">Generate Barcodes</button>
+        </form>
+
+        <div id="loading">⚙️ Generating State-Compliant Data & Processing...</div>
+
+        <div id="output">
+            <div class="barcode-section">
+                <h4>Generated PDF417 Barcode</h4>
+                <img id="pdf417Img" alt="PDF417 Barcode">
+                <a id="download417Btn" class="dl-btn" download="pdf417_barcode.png">Download PDF417 (PNG)</a>
+            </div>
+            <br><br>
+            <div class="barcode-section">
+                <h4>Generated Code 128 Barcode (ICN)</h4>
+                <img id="code128Img" alt="Code 128 Barcode">
+                <a id="download128Btn" class="dl-btn" download="code128_barcode.png">Download Code 128 (PNG)</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Optional convenience: Auto-sync DAJ state text input when dropdown changes
+        document.getElementById('targetState').addEventListener('change', function() {
+            if(this.value) {
+                document.getElementById('daj').value = this.value;
+            }
+        });
+
+        document.getElementById('barcodeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('output').style.display = 'none';
+
+            const payload = {
+                targetState: document.getElementById('targetState').value,
+                daq: document.getElementById('daq').value,
+                dac: document.getElementById('dac').value,
+                dad: document.getElementById('dad').value,
+                dcs: document.getElementById('dcs').value,
+                dcu: document.getElementById('dcu').value,
+                dca: document.getElementById('dca').value,
+                dbd: document.getElementById('dbd').value,
+                dbb: document.getElementById('dbb').value,
+                dba: document.getElementById('dba').value,
+                dbc: document.getElementById('dbc').value,
+                dau: document.getElementById('dau').value,
+                day: document.getElementById('day').value,
+                daw: document.getElementById('daw').value,
+                daz: document.getElementById('daz').value,
+                dcl: document.getElementById('dcl').value,
+                dcb: document.getElementById('dcb').value,
+                dcd: document.getElementById('dcd').value,
+                dag: document.getElementById('dag').value,
+                dai: document.getElementById('dai').value,
+                daj: document.getElementById('daj').value,
+                dak: document.getElementById('dak').value,
+                dcf: document.getElementById('dcf').value,
+                dck: document.getElementById('dck').value
+            };
+
+            try {
+                const fetchImageBlob = async (endpoint) => {
+                    const res = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!res.ok) {
+                        const errText = await res.text();
+                        throw new Error(errText || 'Server error');
+                    }
+                    return await res.blob();
+                };
+
+                const [blob417, blob128] = await Promise.all([
+                    fetchImageBlob('/generate-pdf417'),
+                    fetchImageBlob('/generate-code128')
+                ]);
+
+                const url417 = URL.createObjectURL(blob417);
+                const url128 = URL.createObjectURL(blob128);
+
+                document.getElementById('pdf417Img').src = url417;
+                document.getElementById('download417Btn').href = url417;
+
+                document.getElementById('code128Img').src = url128;
+                document.getElementById('download128Btn').href = url128;
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('output').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loading').style.display = 'none';
+                alert('Error generating barcodes: ' + err.message);
+            }
+        });
+    </script>
+</body>
+</html>
