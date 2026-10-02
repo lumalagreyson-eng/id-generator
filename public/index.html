@@ -253,14 +253,15 @@
     </div>
 
     <script>
-        <script>
-        // Force clear all fields on page load to prevent browser autofill
-        window.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('#barcodeForm input, #barcodeForm select').forEach(element => {
-                if (element.type === 'text' || element.tagName === 'SELECT') {
-                    element.value = '';
-                }
-            });
+        // Force clear all fields immediately and after browser autofill attempts
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelectorAll('#barcodeForm input, #barcodeForm select').forEach(element => {
+                    if (element.type === 'text' || element.tagName === 'SELECT') {
+                        element.value = '';
+                    }
+                });
+            }, 50);
         });
 
         // --- Your long existing code continues right below this line ---
